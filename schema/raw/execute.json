@@ -9,7 +9,8 @@
       ],
       "properties": {
         "increment": {
-          "type": "object"
+          "type": "object",
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
@@ -30,7 +31,8 @@
               "type": "integer",
               "format": "int32"
             }
-          }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false

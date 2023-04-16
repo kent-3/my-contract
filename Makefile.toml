@@ -1,3 +1,6 @@
+[env]
+CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
+
 [tasks.format]
 install_crate = "rustfmt"
 command = "cargo"
@@ -17,9 +20,15 @@ command = "cargo"
 args = ["test"]
 dependencies = ["clean"]
 
+[tasks.schema]
+command = "cargo"
+args = ["run", "schema"]
+
 [tasks.my-flow]
 dependencies = [
     "format",
     "build",
-    "test"
+    "test",
+    "schema"
 ]
+
