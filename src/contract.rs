@@ -19,6 +19,7 @@ pub fn instantiate(
 
     deps.api
         .debug(format!("Contract was initialized by {}", info.sender).as_str());
+
     config(deps.storage).save(&state)?;
 
     Ok(Response::default())

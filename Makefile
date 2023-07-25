@@ -11,22 +11,22 @@ test: unit-test
 
 .PHONY: unit-test
 unit-test:
-	cargo unit-test
+	cargo +nightly test --lib --features backtraces
 
 # This is a local build with debug-prints activated. Debug prints only show up
 # in the local development chain (see the `start-server` command below)
 # and mainnet won't accept contracts built with the feature enabled.
 .PHONY: build _build
-build: _build compress-wasm
+build: _build
 _build:
-	RUSTFLAGS='-C link-arg=-s' cargo build --release --target wasm32-unknown-unknown
+	RUSTFLAGS='-C link-arg=-s' cargo build --lib --target wasm32-unknown-unknown
 
 # This is a build suitable for uploading to mainnet.
 # Calls to `debug_print` get removed by the compiler.
 .PHONY: build-mainnet _build-mainnet
 build-mainnet: _build-mainnet compress-wasm
 _build-mainnet:
-	RUSTFLAGS='-C link-arg=-s' cargo build --release --target wasm32-unknown-unknown
+	RUSTFLAGS='-C link-arg=-s' cargo build --release --lib --target wasm32-unknown-unknown
 
 # like build-mainnet, but slower and more deterministic
 .PHONY: build-mainnet-reproducible
@@ -34,13 +34,13 @@ build-mainnet-reproducible:
 	docker run --rm -v "$$(pwd)":/contract \
 		--mount type=volume,source="$$(basename "$$(pwd)")_cache",target=/contract/target \
 		--mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
-		ghcr.io/scrtlabs/localsecret:v1.8.0
+		enigmampc/secret-contract-optimizer:1.0.10
 
 .PHONY: compress-wasm
 compress-wasm:
 	cp ./target/wasm32-unknown-unknown/release/*.wasm ./contract.wasm
-	@## The following line is not necessary, may work only on linux (extra size optimization)
-	@# wasm-opt -Os ./contract.wasm -o ./contract.wasm
+	@# The following line is not necessary, may work only on linux (extra size optimization)
+	wasm-opt -Os ./contract.wasm -o ./contract.wasm
 	cat ./contract.wasm | gzip -9 > ./contract.wasm.gz
 
 .PHONY: schema
